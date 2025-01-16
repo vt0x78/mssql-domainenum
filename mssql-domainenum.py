@@ -25,8 +25,8 @@ def sid_to_str(sid):
 
     return 'S-{0}-{1}-{2}'.format(revision, iav, '-'.join([str(sub_id) for sub_id in domain_sub_ids]))
 
-def extract_domain(cursor):
-    cursor.execute(f"select sys.fn_varbintohexstr(SUSER_SID('{args.ip}\\Administrator')) as Domain;")
+def extract_domain(cursor, domain):
+    cursor.execute(f"select sys.fn_varbintohexstr(SUSER_SID('{domain}\\Administrator')) as Domain;")
     row = cursor.fetchone()
     if row:
         sid = row['Domain']
@@ -57,7 +57,7 @@ def rid_brute(domain_sid, start_rid=1100, max_failures=5):
 
     print(f"\nExtraction stopped after reaching a sequence of {max_failures} consecutive empty results.")
 
-domain_sid = extract_domain(cursor)
+domain_sid = extract_domain(cursor, args.d)
 if domain_sid:
     rid_brute(domain_sid, start_rid=args.start_rid, max_failures=args.max_failures)
 
