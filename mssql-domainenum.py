@@ -2,6 +2,7 @@ import pymssql, struct, argparse
 
 parser = argparse.ArgumentParser(add_help=True, description="Enumerate domain users/groups using mssql connection.")
 parser.add_argument('-ip', action='store', required=True, help='IP from MSSQL Server')
+parser.add_argument('-d', action='store', required=True, help='Domain from MSSQL Server')
 parser.add_argument('-u', action='store', required=True, help='Username for MSSQL Server')
 parser.add_argument('-p', action='store', required=True, help='Password for MSSQL Server')
 parser.add_argument('-db', action='store', default='tempdb', help='Database to connect (Default: tempdb)')
@@ -25,7 +26,7 @@ def sid_to_str(sid):
     return 'S-{0}-{1}-{2}'.format(revision, iav, '-'.join([str(sub_id) for sub_id in domain_sub_ids]))
 
 def extract_domain(cursor):
-    cursor.execute("select sys.fn_varbintohexstr(SUSER_SID('REDELEGATE\\Administrator')) as Domain;")
+    cursor.execute(f"select sys.fn_varbintohexstr(SUSER_SID('{args.ip}\\Administrator')) as Domain;")
     row = cursor.fetchone()
     if row:
         sid = row['Domain']
